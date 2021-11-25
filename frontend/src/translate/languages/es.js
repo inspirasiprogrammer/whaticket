@@ -40,6 +40,17 @@ const messages = {
             title: "Tickets hoy: ",
           },
         },
+        messages: {
+          inAttendance: {
+            title: "En servicio"
+          },
+          waiting: {
+            title: "Esperando"
+          },
+          closed: {
+            title: "Finalizado"
+          }
+        }
       },
       connections: {
         title: "Conexiones",
@@ -239,6 +250,8 @@ const messages = {
       transferTicketModal: {
         title: "Transferir Ticket",
         fieldLabel: "Escriba para buscar usuarios",
+        fieldQueueLabel: "Transferir a la cola",
+        fieldQueuePlaceholder: "Seleccione una cola",
         noOptions: "No se encontraron usuarios con ese nombre",
         buttons: {
           ok: "Transferir",
@@ -371,7 +384,7 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Escribe un mensaje",
+        placeholderOpen: "Escriba un mensaje o presione '' / '' para usar las respuestas rápidas registradas",
         placeholderClosed:
           "Vuelva a abrir o acepte este ticket para enviar un mensaje.",
         signMessage: "Firmar",

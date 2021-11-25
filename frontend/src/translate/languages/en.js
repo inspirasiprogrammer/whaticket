@@ -39,6 +39,17 @@ const messages = {
             title: "Tickets today: ",
           },
         },
+        messages: {
+          inAttendance: {
+            title: "In Service"
+          },
+          waiting: {
+            title: "Waiting"
+          },
+          closed: {
+            title: "Closed"
+          }
+        }
       },
       connections: {
         title: "Connections",
@@ -236,6 +247,8 @@ const messages = {
       transferTicketModal: {
         title: "Transfer Ticket",
         fieldLabel: "Type to search for users",
+        fieldQueueLabel: "Transfer to queue",
+        fieldQueuePlaceholder: "Please select a queue",
         noOptions: "No user found with this name",
         buttons: {
           ok: "Transfer",
@@ -366,7 +379,7 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Type a message",
+        placeholderOpen: "Type a message or press ''/'' to use the registered quick responses",
         placeholderClosed: "Reopen or accept this ticket to send a message.",
         signMessage: "Sign",
       },
