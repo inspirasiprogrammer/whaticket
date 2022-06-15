@@ -1,5 +1,5 @@
 import qrCode from "qrcode-terminal";
-import { Client } from "whatsapp-web.js";
+import { Client, LocalAuth } from "whatsapp-web.js";
 import { getIO } from "./socket";
 import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
@@ -42,12 +42,14 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       if (whatsapp && whatsapp.session) {
         sessionCfg = JSON.parse(whatsapp.session);
       }
-
-      const wbot: Session = new Client({
+	  
+	  const wbot: Session = new Client({
         session: sessionCfg,
-        puppeteer: {
+        authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id}),
+        puppeteer: { 
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
           executablePath: process.env.CHROME_BIN || undefined
-        }
+      },
       });
 
       wbot.initialize();
@@ -71,9 +73,9 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
 
       wbot.on("authenticated", async session => {
         logger.info(`Session: ${sessionName} AUTHENTICATED`);
-        await whatsapp.update({
-          session: JSON.stringify(session)
-        });
+//        await whatsapp.update({
+//          session: JSON.stringify(session)
+//        });
       });
 
       wbot.on("auth_failure", async msg => {

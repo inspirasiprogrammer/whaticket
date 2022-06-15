@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import openSocket from "socket.io-client";
+import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import Select from "@material-ui/core/Select";
+import TextField from "@material-ui/core/TextField";
 import { toast } from "react-toastify";
 
 import api from "../../services/api";
@@ -16,13 +17,15 @@ const useStyles = makeStyles(theme => ({
 	root: {
 		display: "flex",
 		alignItems: "center",
-		padding: theme.spacing(4),
+		padding: theme.spacing(8, 8, 3),
 	},
 
 	paper: {
 		padding: theme.spacing(2),
 		display: "flex",
 		alignItems: "center",
+		marginBottom: 12,
+
 	},
 
 	settingOption: {
@@ -31,6 +34,7 @@ const useStyles = makeStyles(theme => ({
 	margin: {
 		margin: theme.spacing(1),
 	},
+
 }));
 
 const Settings = () => {
@@ -51,7 +55,7 @@ const Settings = () => {
 	}, []);
 
 	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+		const socket = openSocket();
 
 		socket.on("settings", data => {
 			if (data.action === "update") {
@@ -117,7 +121,21 @@ const Settings = () => {
 							{i18n.t("settings.settings.userCreation.options.disabled")}
 						</option>
 					</Select>
+
 				</Paper>
+
+				<Paper className={classes.paper}>
+					<TextField
+						id="api-token-setting"
+						readonly
+						label="Token Api"
+						margin="dense"
+						variant="outlined"
+						fullWidth
+						value={settings && settings.length > 0 && getSettingValue("userApiToken")}
+					/>
+				</Paper>
+
 			</Container>
 		</div>
 	);

@@ -3,6 +3,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=canove_whaticket&metric=alert_status)](https://sonarcloud.io/dashboard?id=canove_whaticket)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=canove_whaticket&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=canove_whaticket)
 [![Discord Chat](https://img.shields.io/discord/784109818247774249.svg?logo=discord)](https://discord.gg/Dp2tTZRYHg)
+[![Forum](https://img.shields.io/badge/forum-online-blue.svg?logo=discourse)](https://whaticket.online/)
 
 # WhaTicket
 
@@ -15,10 +16,6 @@ Backend uses [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) t
 Frontend is a full-featured multi-user _chat app_ bootstrapped with react-create-app and Material UI, that comunicates with backend using REST API and Websockets. It allows you to interact with contacts, tickets, send and receive WhatsApp messages.
 
 **NOTE**: I can't guarantee you will not be blocked by using this method, although it has worked for me. WhatsApp does not allow bots or unofficial clients on their platform, so this shouldn't be considered totally safe.
-
-## Motivation
-
-I'm a SysAdmin, and in my daily work, I do a lot of support through WhatsApp. Since WhatsApp Web doesn't allow multiple users, and 90% of our tickets comes from this channel, we created this to share same whatsapp account cross our team.
 
 ## How it works?
 
@@ -49,6 +46,14 @@ _Note_: change MYSQL_DATABASE, MYSQL_PASSWORD, MYSQL_USER and MYSQL_ROOT_PASSWOR
 
 ```bash
 docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DATABASE=whaticket -e MYSQL_USER=whaticket -e MYSQL_PASSWORD=whaticket --restart always -p 3306:3306 -d mariadb:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+
+# Or run using `docker-compose` as below
+# Before copy .env.example to .env first and set the variables in the file.
+docker-compose up -d mysql
+
+# To administer this mysql database easily using phpmyadmin. 
+# It will run by default on port 9000, but can be changed in .env using `PMA_PORT`
+docker-compose -f docker-compose.phpmyadmin.yaml up -d
 ```
 
 Install puppeteer dependencies:
@@ -123,7 +128,9 @@ npm start
 - Wait for QR CODE button to appear, click it and read qr code.
 - Done. Every message received by your synced WhatsApp number will appear in Tickets List.
 
-## Basic production deployment (Ubuntu 18.04 VPS)
+## Basic production deployment
+
+### Using Ubuntu 20.04 VPS
 
 All instructions below assumes you are NOT running as root, since it will give an error in puppeteer. So let's start creating a new user and granting sudo privileges to it:
 
@@ -146,7 +153,7 @@ Update all system packages:
 sudo apt update && sudo apt upgrade
 ```
 
-Install node and confirm node command is available:
+Install node, and confirm node command is available:
 
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
@@ -173,6 +180,14 @@ _Note_: change MYSQL_DATABASE, MYSQL_PASSWORD, MYSQL_USER and MYSQL_ROOT_PASSWOR
 
 ```bash
 docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DATABASE=whaticket -e MYSQL_USER=whaticket -e MYSQL_PASSWORD=whaticket --restart always -p 3306:3306 -d mariadb:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+
+# Or run using `docker-compose` as below
+# Before copy .env.example to .env first and set the variables in the file.
+docker-compose up -d mysql
+
+# To administer this mysql database easily using phpmyadmin. 
+# It will run by default on port 9000, but can be changed in .env using `PMA_PORT`
+docker-compose -f docker-compose.phpmyadmin.yaml up -d
 ```
 
 Clone this repository:
@@ -231,7 +246,7 @@ sudo npm install -g pm2
 pm2 start dist/server.js --name whaticket-backend
 ```
 
-Make pm2 auto start afeter reboot:
+Make pm2 auto start after reboot:
 
 ```bash
 pm2 startup ubuntu -u `YOUR_USERNAME`
@@ -250,7 +265,7 @@ cd ../frontend
 npm install
 ```
 
-Edit .env file and fill it with your backend address, it should look like this:
+Create frontend .env file and fill it ONLY with your backend address, it should look like this:
 
 ```bash
 REACT_APP_BACKEND_URL = https://api.mydomain.com/
@@ -337,14 +352,14 @@ server {
 }
 ```
 
-Create a symbolic links to enalbe nginx sites:
+Create a symbolic links to enable nginx sites:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/whaticket-frontend /etc/nginx/sites-enabled
 sudo ln -s /etc/nginx/sites-available/whaticket-backend /etc/nginx/sites-enabled
 ```
 
-By default, nginx limit body size to 1MB, what isn't enough to some media uploads. Lets change it to 20MB adding a new line to config file:
+By default, nginx limit body size to 1MB, which isn't enough for some media uploads. Lets change it to 20MB, adding a new line to config file:
 
 ```bash
 sudo nano /etc/nginx/nginx.conf
@@ -362,20 +377,96 @@ sudo nginx -t
 sudo service nginx restart
 ```
 
-Now, enable SSL (https) on your sites to use all app features like notifications and sending audio messages. A easy way to this is using Certbot:
+Now, enable SSL (https) on your sites to use all app features like notifications and sending audio messages. An easy way to this is using Certbot:
 
 Install certbot:
 
 ```bash
-sudo add-apt-repository ppa:certbot/certbot
+sudo snap install --classic certbot
 sudo apt update
-sudo apt install python-certbot-nginx
 ```
 
-Enable SSL on nginx (Fill / Accept all information asked):
+Enable SSL on nginx (Fill / Accept all information required):
 
 ```bash
 sudo certbot --nginx
+```
+
+### Using docker and docker-compose
+
+To run WhaTicket using docker you must perform the following steps:
+
+```bash
+cp .env.example .env
+```
+
+Now it will be necessary to configure the .env using its information, the variables are the same as those mentioned in the deployment using ubuntu, with the exception of mysql settings that were not in the .env. 
+
+```bash
+# MYSQL
+MYSQL_ENGINE=                           # default: mariadb
+MYSQL_VERSION=                          # default: 10.6
+MYSQL_ROOT_PASSWORD=strongpassword      # change it please
+MYSQL_DATABASE=whaticket
+MYSQL_PORT=3306                         # default: 3306; Use this port to expose mysql server
+TZ=America/Fortaleza                    # default: America/Fortaleza; Timezone for mysql
+
+# BACKEND
+BACKEND_PORT=                           # default: 8080; but access by host not use this port
+BACKEND_SERVER_NAME=api.mydomain.com
+BACKEND_URL=https://api.mydomain.com
+PROXY_PORT=443
+JWT_SECRET=3123123213123                # change it please
+JWT_REFRESH_SECRET=75756756756          # change it please
+
+# FRONTEND
+FRONTEND_PORT=80                        # default: 3000; Use port 80 to expose in production
+FRONTEND_SSL_PORT=443                   # default: 3001; Use port 443 to expose in production
+FRONTEND_SERVER_NAME=myapp.mydomain.com
+FRONTEND_URL=https://myapp.mydomain.com
+
+# BROWSERLESS
+MAX_CONCURRENT_SESSIONS=                # default: 1; Use only if using browserless
+```
+
+After defining the variables, run the following command:
+
+```bash
+docker-compose up -d --build
+```
+
+On the `first` run it will be necessary to seed the database tables using the following command:
+
+```bash
+docker-compose exec backend npx sequelize db:seed:all
+```
+
+#### SSL Certificate
+
+To deploy the ssl certificate, add it to the `ssl/certs` folder. Inside it there should be a `backend` and a `frontend` folder, and each of them should contain the files `fullchain.pem` and `privkey.pem`, as in the structure below:
+
+```bash
+.
+├── certs
+│   ├── backend
+│   │   ├── fullchain.pem
+│   │   └── privkey.pem
+│   └── frontend
+│       ├── fullchain.pem
+│       └── privkey.pem
+└── www
+```
+
+To generate the certificate files use `certbot` which can be installed using snap, I used the following command:
+
+Note: The frontend container that runs nginx is already prepared to receive the request made by certboot to validate the certificate.
+
+```bash
+# FRONTEND
+certbot certonly --cert-name backend --webroot --webroot-path ./ssl/www/ -d api.mydomain.com
+
+# BACKEND
+certbot certonly --cert-name frontend --webroot --webroot-path ./ssl/www/ -d myapp.mydomain.com
 ```
 
 ## Access Data
