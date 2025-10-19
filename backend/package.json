@@ -7,15 +7,19 @@
     "build": "tsc",
     "watch": "tsc -w",
     "start": "nodemon dist/server.js",
-    "dev:server": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts",
     "pretest": "NODE_ENV=test sequelize db:migrate && NODE_ENV=test sequelize db:seed:all",
     "test": "NODE_ENV=test jest",
-    "posttest": "NODE_ENV=test sequelize db:migrate:undo:all"
+    "posttest": "NODE_ENV=test sequelize db:migrate:undo:all",
+    "db:migrate": "sequelize db:migrate",
+    "db:seed": "sequelize db:seed:all",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@sentry/node": "^5.29.2",
+    "@types/lodash": "^4.17.5",
     "@types/pino": "^6.3.4",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
@@ -39,7 +43,7 @@
     "sequelize-typescript": "^1.1.0",
     "socket.io": "^3.0.5",
     "uuid": "^8.3.2",
-    "whatsapp-web.js": "^1.22.1",
+    "whatsapp-web.js": "^1.31.0",
     "yup": "^0.32.8"
   },
   "devDependencies": {
@@ -60,6 +64,7 @@
     "@types/uuid": "^8.3.3",
     "@types/validator": "^13.1.0",
     "@types/yup": "^0.29.8",
+    "@types/lodash": "4.14",
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
     "eslint": "^7.10.0",
@@ -76,6 +81,6 @@
     "supertest": "^5.0.0",
     "ts-jest": "^26.4.1",
     "ts-node-dev": "^1.0.0-pre.63",
-    "typescript": "4.1.6"
+    "typescript": "^4.7.4"
   }
 }
